@@ -1,0 +1,41 @@
+version: '3.5'
+
+services:
+    web:
+        image: nginx
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf
+        ports:
+            - 80:80
+        environment:
+            - NGINX_HOST=http://localhost
+            - NGINX_PORT=80
+        depends_on:
+            - frontend
+            - backend
+    db:
+        image: postgres:13.2-alpine
+        restart: unless-stopped
+        environment:
+            - POSTGRES_PASSWORD=example
+        container_name: db_backend
+        volumes:
+            - database:/var/lib/postgresql/data
+    redis:
+        image: redis:latest
+    frontend:
+        image: frontend
+    backend:
+        image: backend
+        environment:
+            - REDIS_HOST=redis
+            - POSTGRES_PASSWORD=example
+            - POSTGRES_HOST=db_backend
+        depends_on:
+            - db
+
+
+
+volumes:
+    database:
+
